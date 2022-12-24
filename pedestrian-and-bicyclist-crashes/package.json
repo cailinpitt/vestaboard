@@ -1,0 +1,23 @@
+{
+  "name": "pedestrian-and-bicyclist-crashes",
+  "version": "1.0.0",
+  "description": "vestaboard script to print number of pedestrian and bicyclist crashes in a city over the past 24 hours",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cailinpitt/vestaboard.git"
+  },
+  "author": "cailin pitt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cailinpitt/vestaboard/issues"
+  },
+  "homepage": "https://github.com/cailinpitt/vestaboard#readme",
+  "dependencies": {
+    "axios": "^1.2.1",
+    "minimist": "^1.2.7"
+  }
+}
