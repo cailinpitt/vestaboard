@@ -1,0 +1,15 @@
+{
+  "name": "helpers",
+  "version": "1.0.0",
+  "description": "Helpers for vestaboard scripts",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "cailin pitt",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "sinon": "^15.0.1"
+  }
+}
