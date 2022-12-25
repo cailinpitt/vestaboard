@@ -1,5 +1,11 @@
 const axios = require('axios');
 const argv = require('minimist')(process.argv.slice(2));
+const Message = require('../helpers/message.js').Message;
+const { 
+  blankLine,
+  fillLine,
+  sendToVestaboard,
+} = require("../helpers/vestaboard");
 
 /**
  * Makes a GET request to Citizen to fetch 200 recent incidents. Using 200 because I think that
@@ -93,52 +99,36 @@ const filterIncidents = (allIncidents) => {
     return Array.from(new Set([...relevantIncidents, ...incidentsWithRelevantUpdates]));
 };
 
-const sendToVestaboard = async (readWriteKey, message) => {
-  await axios.post('https://rw.vestaboard.com', message, {
-    headers: {
-      'X-Vestaboard-Read-Write-Key': readWriteKey,
-    }
-  });
-};
-
-const convertDigit = (stringDigit) => {
-  if (stringDigit === "0") {
-    return 36;
-  } else {
-    return Number(stringDigit) + 26;
-  }
-};
-
 const main = async () => {
-    const allIncidents = await fetchIncidents();
-    const filteredIncidents = filterIncidents(allIncidents);
-    const numIncidents = filteredIncidents.length;
+  const allIncidents = await fetchIncidents();
+  const filteredIncidents = filterIncidents(allIncidents);
+  const numIncidents = filteredIncidents.length;
+  const dipColor = numIncidents === 0 ? "Green" : "PoppyRed";
 
-    const convertedNum = convertDigit(numIncidents.toString());
-    const borderColor = numIncidents === 0 ? "66" : "63";
-
-    // https://docs.vestaboard.com/characters
-    const firstLine = numIncidents !== 1 ? 
-      `[${borderColor},0,0,0,0,0,20,8,5,18,5,0,23,5,18,5,0,0,0,0,0,${borderColor}]` : 
-      `[${borderColor},0,0,0,0,0,20,8,5,18,5,0,23,1,19,0,0,0,0,0,0,${borderColor}]` 
-    // THERE WERE : THERE WAS
-    const secondLine = `[${borderColor},59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,59,${borderColor}]`
-    // ////////////////////
-    const thirdLine = `[${borderColor},0,${convertedNum},0,16,5,4,5,19,20,18,9,1,14,0,47,0,2,9,11,5,${borderColor}]` 
-    // x PEDESTRIAN & BIKE
-    const fourthLine = numIncidents !== 1 ? 
-      `[${borderColor},0,3,18,1,19,8,5,19,0,9,14,0,1,20,12,1,14,20,1,0,${borderColor}]` : 
-      `[${borderColor},0,0,3,18,1,19,8,0,9,14,0,1,20,12,1,14,20,1,0,0,${borderColor}]`
-    // CRASHES IN ATLANTA : CRASH IN ATLANTA
-    const fifthLine = `[${borderColor},0,0,0,0,15,22,5,18,0,20,8,5,0,16,1,19,20,0,0,0,${borderColor}]`
-    // OVER THE PAST
-    const sixthLine = `[${borderColor},0,0,20,23,5,14,20,25,44,6,15,21,18,0,8,15,21,18,19,0,${borderColor}]` 
-    // TWENTY-FOUR HOURS
+  const firstLine = new Message(numIncidents === 1 ? "there was" : "there were")
+    .center()
+    .dipEnds(dipColor);
+  const secondLine = new Message(fillLine("/"))
+    .center()
+    .dipEnds(dipColor);
+  const thirdLine = new Message(`${numIncidents} pedestrian & bike`)
+    .center()
+    .dipEnds(dipColor);
+  const fourthLine = new Message(numIncidents === 1 ? "crash in atlanta" : "crashes in atlanta")
+    .center()
+    .dipEnds(dipColor);
+  const fifthLine = new Message("over the past")
+    .center()
+    .dipEnds(dipColor);
+  const sixthLine = new Message("twenty-four hours")
+    .center()
+    .dipEnds(dipColor);
     
-    await sendToVestaboard(
-      argv.key, 
-      `[${firstLine},${secondLine},${thirdLine},${fourthLine},${fifthLine},${sixthLine}]`,
-    );
+  await sendToVestaboard(
+    axios,
+    argv.key, 
+    `[${firstLine.toString()},${secondLine.toString()},${thirdLine.toString()},${fourthLine.toString()},${fifthLine.toString()},${sixthLine.toString()}]`,
+  );
 };
 
 main();
